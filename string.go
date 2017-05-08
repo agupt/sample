@@ -1,35 +1,35 @@
 package sample
 
 func lengthOfLongestSubstring(s string) int {
-	l, _ := longestSubString(s)
+	_, _, l := longestSubString(s)
 	return l
 }
 
-func longestSubString(s string) (int, int) {
-	var maxLen, index, cur_maxLen, cur_index int = 0, 0, 0, 0
-	runeMap := make(map[rune]bool)
-	for i, c := range s {
-		if _, ok := runeMap[c]; ok {
-			if maxLen < cur_maxLen {
-				// adjust last know max lenght
-				maxLen = cur_maxLen
-				index = cur_index
+func longestSubString(s string) (int, int, int) {
+	charMap := make(map[rune]int)
+	var lStart, lEnd, lLen int // start & end index of current longgest substring
+	var cStart, cEnd, cLen int // start & end index of current substring under investigation
+	for i, r := range s {
+		if chIndex, ok := charMap[r]; ok && chIndex >= cStart {
+			// found dup after current start index; update and swtich to next substring
+			if cLen > lLen {
+				// substring under investigation is current longest
+				lStart = cStart
+				lEnd = cEnd
+				lLen = cLen
 			}
-			// reset current
-			cur_maxLen = 1
-			cur_index = i
-			runeMap = make(map[rune]bool)
-			runeMap[c] = true
-			continue
+			cStart = chIndex + 1
 		}
-		cur_maxLen++
-		runeMap[c] = true
+		charMap[r] = i
+		cEnd = i
+		cLen = cEnd - cStart + 1
 	}
-	if maxLen < cur_maxLen {
-		maxLen = cur_maxLen
-		index = cur_index
+	if cLen > lLen {
+		lStart = cStart
+		lEnd = cEnd
+		lLen = cLen
 	}
-	return maxLen, index
+	return lStart, lEnd, lLen
 }
 
 func printLongest(s string, l, startIndex int) string {
